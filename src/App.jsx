@@ -31,6 +31,12 @@ export default function App() {
 
   const activeTheme = getTheme(darkMode ? 'dark' : 'light');
 
+  // Borrower State
+  const [borrowerName, setBorrowerName]               = useState('');
+  const [borrowerPosition, setBorrowerPosition]       = useState('');
+  const [borrowerOffice, setBorrowerOffice]           = useState('');
+
+  // Loan State
   const [loanType, setLoanType]                       = useState(defaultPreset.name);
   const [loanAmount, setLoanAmount]                   = useState(defaultPreset.amount);
   const [interestRateDecimal, setInterestRateDecimal] = useState(defaultPreset.monthlyRateDecimal);
@@ -51,7 +57,21 @@ export default function App() {
 
   const handlePrint     = () => window.print();
   const handleExportCSV = () =>
-    downloadAmortizationCSV(calcResult.schedule, loanType, loanAmount, interestRateDecimal, numMonths);
+    downloadAmortizationCSV({
+      schedule: calcResult.schedule,
+      borrowerName,
+      borrowerPosition,
+      borrowerOffice,
+      loanType,
+      loanAmount,
+      monthlyRateDecimal: interestRateDecimal,
+      numMonths,
+      calcResult,
+      preparedByName,
+      preparedByTitle,
+      approvedByName,
+      approvedByTitle,
+    });
 
   const tabs = [
     { label: 'Amortization Schedule', icon: <TableViewIcon sx={{ fontSize: 15 }} /> },
@@ -64,6 +84,9 @@ export default function App() {
 
       {/* Official Print Schedule Document (Only visible when printing via @media print) */}
       <PrintScheduleDocument
+        borrowerName={borrowerName}
+        borrowerPosition={borrowerPosition}
+        borrowerOffice={borrowerOffice}
         loanType={loanType}
         loanAmount={loanAmount}
         interestRateDecimal={interestRateDecimal}
@@ -117,6 +140,9 @@ export default function App() {
               }}
             >
               <MuiLoanForm
+                borrowerName={borrowerName}             setBorrowerName={setBorrowerName}
+                borrowerPosition={borrowerPosition}     setBorrowerPosition={setBorrowerPosition}
+                borrowerOffice={borrowerOffice}         setBorrowerOffice={setBorrowerOffice}
                 loanType={loanType}                     setLoanType={setLoanType}
                 loanAmount={loanAmount}                 setLoanAmount={setLoanAmount}
                 interestRateDecimal={interestRateDecimal}
@@ -178,7 +204,7 @@ export default function App() {
               {/* Panels */}
               <Box>
                 {activeTab === 0 && (
-                  <MuiAmortizationTable schedule={calcResult.schedule} loanType={loanType} />
+                  <MuiAmortizationTable schedule={calcResult.schedule} loanType={loanType} borrowerName={borrowerName} />
                 )}
                 {activeTab === 1 && (
                   <MuiExtraPaymentSimulator

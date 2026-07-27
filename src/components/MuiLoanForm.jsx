@@ -10,6 +10,9 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import PercentIcon from '@mui/icons-material/Percent';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import DrawIcon from '@mui/icons-material/Draw';
+import PersonIcon from '@mui/icons-material/Person';
+import BadgeIcon from '@mui/icons-material/Badge';
+import BusinessIcon from '@mui/icons-material/Business';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { PHILFIDA_LOAN_PRESETS } from '../data/philfidaPrograms';
 import { formatCurrency } from '../utils/loanCalculations';
@@ -22,6 +25,9 @@ const PRESET_CONFIG = {
 };
 
 export default function MuiLoanForm({
+  borrowerName, setBorrowerName,
+  borrowerPosition, setBorrowerPosition,
+  borrowerOffice, setBorrowerOffice,
   loanType, setLoanType,
   loanAmount, setLoanAmount,
   interestRateDecimal, setInterestRateDecimal,
@@ -160,8 +166,66 @@ export default function MuiLoanForm({
 
         <Divider sx={{ borderColor: isDark ? '#334155' : '#F3F4F6' }} />
 
+        {/* Borrower Details Section */}
+        <Stack spacing={1.25}>
+          <Typography sx={{ color: 'text.secondary', fontSize: '0.62rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em' }}>
+            Borrower Profile
+          </Typography>
+
+          <TextField
+            label="Borrower / Account Name"
+            placeholder="e.g. Juan De La Cruz"
+            value={borrowerName}
+            onChange={(e) => setBorrowerName(e.target.value)}
+            fullWidth size="small"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <PersonIcon sx={{ fontSize: 15, color: isDark ? '#64748B' : '#9CA3AF' }} />
+                </InputAdornment>
+              ),
+            }}
+          />
+
+          <TextField
+            label="Position / Designation"
+            placeholder="e.g. Fiber Development Officer II"
+            value={borrowerPosition}
+            onChange={(e) => setBorrowerPosition(e.target.value)}
+            fullWidth size="small"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <BadgeIcon sx={{ fontSize: 15, color: isDark ? '#64748B' : '#9CA3AF' }} />
+                </InputAdornment>
+              ),
+            }}
+          />
+
+          <TextField
+            label="Designated Office / Station"
+            placeholder="e.g. PhilFIDA Region V - Legazpi Station"
+            value={borrowerOffice}
+            onChange={(e) => setBorrowerOffice(e.target.value)}
+            fullWidth size="small"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <BusinessIcon sx={{ fontSize: 15, color: isDark ? '#64748B' : '#9CA3AF' }} />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Stack>
+
+        <Divider sx={{ borderColor: isDark ? '#334155' : '#F3F4F6' }} />
+
         {/* Inputs — compact size="small" */}
         <Stack spacing={1.5}>
+          <Typography sx={{ color: 'text.secondary', fontSize: '0.62rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em' }}>
+            Loan Financial Terms
+          </Typography>
+
           <TextField
             label="Loan Amount (₱)" type="number"
             value={loanAmount}
@@ -176,6 +240,7 @@ export default function MuiLoanForm({
             }}
             inputProps={{ min: 1000, step: 1000 }}
           />
+
           <TextField
             label="Monthly Interest Rate" type="number"
             value={interestRateDecimal}
@@ -191,6 +256,7 @@ export default function MuiLoanForm({
             inputProps={{ min: 0, step: 0.001 }}
             helperText={`${(interestRateDecimal * 100).toFixed(2)}% per month`}
           />
+
           <TextField
             label="Term (Months)" type="number"
             value={numMonths}
@@ -338,7 +404,7 @@ export default function MuiLoanForm({
             onClick={onExportCSV} fullWidth
             sx={{ py: 0.9, fontSize: '0.8125rem' }}
           >
-            Export CSV
+            Export Excel (.xlsx)
           </Button>
         </Stack>
 

@@ -7,6 +7,7 @@ import {
 import { useTheme } from '@mui/material/styles';
 import TableViewIcon from '@mui/icons-material/TableView';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { formatCurrency } from '../utils/loanCalculations';
 
 const COLUMNS = [
@@ -18,7 +19,7 @@ const COLUMNS = [
   { label: 'New Balance', align: 'right', width: '105px' },
 ];
 
-export default function MuiAmortizationTable({ schedule, loanType }) {
+export default function MuiAmortizationTable({ schedule, loanType, borrowerName = '' }) {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
 
@@ -56,7 +57,7 @@ export default function MuiAmortizationTable({ schedule, loanType }) {
           </Box>
           <Box>
             <Typography sx={{ color: 'text.primary', fontWeight: 700, fontSize: '0.85rem' }}>
-              Amortization Schedule
+              {borrowerName ? `Amortization Schedule — ${borrowerName.toUpperCase()}` : 'Amortization Schedule'}
             </Typography>
             {schedule.length > 0 && (
               <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.68rem' }}>
@@ -98,7 +99,7 @@ export default function MuiAmortizationTable({ schedule, loanType }) {
                     fontSize: '0.65rem',
                     textTransform: 'uppercase',
                     letterSpacing: '0.05em',
-                    color: isDark ? '#94A3B8' : '#9CA3AF',
+                    color: i === 2 ? (isDark ? '#F59E0B' : '#D97706') : i === 4 ? (isDark ? '#4ADE80' : '#16A34A') : (isDark ? '#94A3B8' : '#9CA3AF'),
                     bgcolor: isDark ? '#0F172A' : '#F9FAFB',
                     borderBottom: '1px solid',
                     borderColor: isDark ? '#334155' : '#E5E7EB',
@@ -188,7 +189,20 @@ export default function MuiAmortizationTable({ schedule, loanType }) {
                       color: row.newBalance === 0 ? (isDark ? '#4ADE80' : '#15803D') : (isDark ? '#F8FAFC' : '#111827'),
                       letterSpacing: '-0.01em', py: 0.65, px: 1,
                     }}>
-                      {row.newBalance === 0 ? '—' : formatCurrency(row.newBalance)}
+                      {row.newBalance === 0 ? (
+                        <Box sx={{
+                          display: 'inline-flex', alignItems: 'center', gap: 0.3,
+                          bgcolor: isDark ? 'rgba(34,197,94,0.2)' : '#DCFCE7',
+                          color: isDark ? '#4ADE80' : '#15803D',
+                          border: '1px solid', borderColor: isDark ? 'rgba(34,197,94,0.4)' : '#86EFAC',
+                          px: 0.75, py: 0.15, borderRadius: 1, fontSize: '0.68rem', fontWeight: 800,
+                        }}>
+                          <span>₱0.00</span>
+                          <CheckCircleIcon sx={{ fontSize: 12 }} />
+                        </Box>
+                      ) : (
+                        formatCurrency(row.newBalance)
+                      )}
                     </TableCell>
                   </TableRow>
                 );

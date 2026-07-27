@@ -3,6 +3,9 @@ import { Box, Typography, Divider } from '@mui/material';
 import { formatCurrency } from '../utils/loanCalculations';
 
 export default function PrintScheduleDocument({
+  borrowerName = '',
+  borrowerPosition = '',
+  borrowerOffice = '',
   loanType,
   loanAmount,
   interestRateDecimal,
@@ -60,10 +63,28 @@ export default function PrintScheduleDocument({
       {/* Loan Metadata Summary */}
       <Box sx={{ border: '1px solid #333', borderRadius: 1, p: 1.5, mb: 1.75, bgcolor: '#fafafa' }}>
         <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 0.75, textTransform: 'uppercase', fontSize: '0.7rem', borderBottom: '1px solid #ccc', pb: 0.25 }}>
-          Loan Summary & Key Details
+          Loan Summary & Borrower Profile
         </Typography>
 
         <Box display="grid" gridTemplateColumns="1fr 1fr" gap={0.75} sx={{ fontSize: '0.78rem' }}>
+          <Box gridColumn="span 2" sx={{ pb: 0.5, borderBottom: '1px dashed #ccc', mb: 0.25 }}>
+            <Box display="grid" gridTemplateColumns="1fr 1fr" gap={0.5}>
+              <Box>
+                <strong>Borrower Name:</strong>{' '}
+                <span style={{ fontWeight: 800, fontSize: '0.85rem', color: '#000', textTransform: 'uppercase' }}>
+                  {borrowerName ? borrowerName : 'N/A (GENERAL ESTIMATE)'}
+                </span>
+              </Box>
+              <Box>
+                <strong>Position / Designation:</strong>{' '}
+                <span style={{ fontWeight: 600 }}>{borrowerPosition ? borrowerPosition : 'N/A'}</span>
+              </Box>
+              <Box gridColumn="span 2">
+                <strong>Designated Office / Station:</strong>{' '}
+                <span style={{ fontWeight: 600 }}>{borrowerOffice ? borrowerOffice : 'N/A'}</span>
+              </Box>
+            </Box>
+          </Box>
           <Box><strong>Loan Program / Type:</strong> {loanType || 'Regular Loan'}</Box>
           <Box><strong>Principal Amount:</strong> {formatCurrency(loanAmount)}</Box>
           <Box><strong>Monthly Interest Rate:</strong> {(interestRateDecimal * 100).toFixed(2)}% per month</Box>
@@ -115,41 +136,43 @@ export default function PrintScheduleDocument({
         </tfoot>
       </table>
 
-      {/* Customizable Signatures Block */}
-      <Box className="print-avoid-break" mt={2.5} pt={1} display="grid" gridTemplateColumns="1fr 1fr" gap={4}>
-        <Box>
-          <Typography variant="caption" sx={{ display: 'block', color: '#555', mb: 2.5 }}>
+      {/* Customizable Signatures Block with Generous Physical Signature Space */}
+      <Box className="print-avoid-break" mt={3} pt={1} display="grid" gridTemplateColumns="1fr 1fr" gap={4}>
+        <Box display="flex" flexDirection="column">
+          <Typography variant="caption" sx={{ display: 'block', color: '#555', mb: 0.5 }}>
             Prepared & Certified By:
           </Typography>
-          {preparedByName && (
-            <Typography variant="body1" sx={{ fontWeight: 800, fontSize: '0.825rem', mb: 0.2, textTransform: 'uppercase' }}>
-              {preparedByName}
-            </Typography>
-          )}
-          <Box sx={{ borderBottom: '1px solid #000', width: '210px', mb: 0.4 }} />
+
+          {/* Generous 48px Signature Area */}
+          <Box sx={{ minHeight: 48, display: 'flex', alignItems: 'flex-end', pb: 0.5 }}>
+            {preparedByName && (
+              <Typography variant="body1" sx={{ fontWeight: 800, fontSize: '0.85rem', textTransform: 'uppercase' }}>
+                {preparedByName}
+              </Typography>
+            )}
+          </Box>
+          <Box sx={{ borderBottom: '1.5px solid #000', width: '220px', mb: 0.4 }} />
           <Typography variant="body2" sx={{ fontWeight: 700, fontSize: '0.78rem' }}>
             {preparedByTitle || 'PhilFIDA Account Officer'}
           </Typography>
-          <Typography variant="caption" sx={{ color: '#555', display: 'block', fontSize: '0.68rem' }}>
-            Credit & Financial Operations — Region V
-          </Typography>
         </Box>
 
-        <Box>
-          <Typography variant="caption" sx={{ display: 'block', color: '#555', mb: 2.5 }}>
+        <Box display="flex" flexDirection="column">
+          <Typography variant="caption" sx={{ display: 'block', color: '#555', mb: 0.5 }}>
             Approved & Verified By:
           </Typography>
-          {approvedByName && (
-            <Typography variant="body1" sx={{ fontWeight: 800, fontSize: '0.825rem', mb: 0.2, textTransform: 'uppercase' }}>
-              {approvedByName}
-            </Typography>
-          )}
-          <Box sx={{ borderBottom: '1px solid #000', width: '210px', mb: 0.4 }} />
+
+          {/* Generous 48px Signature Area */}
+          <Box sx={{ minHeight: 48, display: 'flex', alignItems: 'flex-end', pb: 0.5 }}>
+            {approvedByName && (
+              <Typography variant="body1" sx={{ fontWeight: 800, fontSize: '0.85rem', textTransform: 'uppercase' }}>
+                {approvedByName}
+              </Typography>
+            )}
+          </Box>
+          <Box sx={{ borderBottom: '1.5px solid #000', width: '220px', mb: 0.4 }} />
           <Typography variant="body2" sx={{ fontWeight: 700, fontSize: '0.78rem' }}>
             {approvedByTitle || 'Regional Director / OIC'}
-          </Typography>
-          <Typography variant="caption" sx={{ color: '#555', display: 'block', fontSize: '0.7rem' }}>
-            PhilFIDA Regional Office V
           </Typography>
         </Box>
       </Box>
