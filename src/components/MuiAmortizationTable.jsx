@@ -11,20 +11,30 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { formatCurrency } from '../utils/loanCalculations';
 
 const COLUMNS = [
-  { label: '#',           align: 'left',  width: '36px' },
-  { label: 'Balance',     align: 'right', width: '105px' },
-  { label: 'Interest',    align: 'right', width: '90px' },
-  { label: 'Mo. Total',   align: 'right', width: '95px' },
-  { label: 'Payment',     align: 'right', width: '95px' },
-  { label: 'New Balance', align: 'right', width: '105px' },
+  { label: '#',           align: 'left',  width: '40px' },
+  { label: 'Balance',     align: 'right', width: '110px' },
+  { label: 'Principal',   align: 'right', width: '100px' },
+  { label: 'Interest',    align: 'right', width: '95px' },
+  { label: 'Payment',     align: 'right', width: '105px' },
+  { label: 'New Balance', align: 'right', width: '110px' },
 ];
 
 export default function MuiAmortizationTable({ schedule, loanType, borrowerName = '' }) {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
 
-  const totalPayment  = schedule.reduce((s, r) => s + r.payment,  0);
-  const totalInterest = schedule.reduce((s, r) => s + r.interest, 0);
+  const totalPayment   = schedule.reduce((s, r) => s + r.payment,   0);
+  const totalPrincipal = schedule.reduce((s, r) => s + r.principal, 0);
+  const totalInterest  = schedule.reduce((s, r) => s + r.interest,  0);
+
+  // Calculate dynamic row padding so rows expand smoothly to fill container height with zero empty whitespace
+  const rowPaddingY = schedule.length <= 12
+    ? 1.6
+    : schedule.length <= 24
+    ? 1.15
+    : schedule.length <= 36
+    ? 0.9
+    : 0.75;
 
   return (
     <Box sx={{
@@ -36,11 +46,12 @@ export default function MuiAmortizationTable({ schedule, loanType, borrowerName 
       overflow: 'hidden',
       display: 'flex',
       flexDirection: 'column',
+      height: '100%', // Matches exact height of Loan Parameters sidebar card
       transition: 'background-color 0.25s ease, border-color 0.25s ease',
     }}>
       {/* Header */}
       <Box sx={{
-        px: 2, py: 1.5,
+        px: 2.5, py: 1.75,
         borderBottom: '1px solid',
         borderColor: isDark ? '#334155' : '#F3F4F6',
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
@@ -77,16 +88,25 @@ export default function MuiAmortizationTable({ schedule, loanType, borrowerName 
         )}
       </Box>
 
-      {/* Ultra-compact Table */}
+      {/* Table Container - Fills available vertical space down to the footer */}
       <TableContainer sx={{
         flex: 1,
-        maxHeight: 'calc(100vh - 230px)',
-        minHeight: 340,
+        minHeight: 0,
         overflowX: 'auto',
-        '&::-webkit-scrollbar': { width: 4, height: 4 },
-        '&::-webkit-scrollbar-thumb': { bgcolor: isDark ? '#475569' : '#E5E7EB', borderRadius: 8 },
+        overflowY: 'auto',
+        bgcolor: isDark ? '#1E293B' : '#FFFFFF',
+        '&::-webkit-scrollbar': { width: 6, height: 6 },
+        '&::-webkit-scrollbar-thumb': { bgcolor: isDark ? '#475569' : '#CBD5E1', borderRadius: 8 },
       }}>
-        <Table stickyHeader size="small" sx={{ width: '100%', minWidth: 520, tableLayout: 'fixed' }}>
+        <Table
+          stickyHeader
+          size="small"
+          sx={{
+            width: '100%',
+            minWidth: 540,
+            tableLayout: 'fixed',
+          }}
+        >
           <TableHead>
             <TableRow>
               {COLUMNS.map((col, i) => (
@@ -99,7 +119,13 @@ export default function MuiAmortizationTable({ schedule, loanType, borrowerName 
                     fontSize: '0.65rem',
                     textTransform: 'uppercase',
                     letterSpacing: '0.05em',
-                    color: i === 2 ? (isDark ? '#F59E0B' : '#D97706') : i === 4 ? (isDark ? '#4ADE80' : '#16A34A') : (isDark ? '#94A3B8' : '#9CA3AF'),
+                    color: i === 2
+                      ? (isDark ? '#60A5FA' : '#2563EB')
+                      : i === 3
+                      ? (isDark ? '#F59E0B' : '#D97706')
+                      : i === 4
+                      ? (isDark ? '#4ADE80' : '#16A34A')
+                      : (isDark ? '#94A3B8' : '#9CA3AF'),
                     bgcolor: isDark ? '#0F172A' : '#F9FAFB',
                     borderBottom: '1px solid',
                     borderColor: isDark ? '#334155' : '#E5E7EB',
@@ -129,12 +155,12 @@ export default function MuiAmortizationTable({ schedule, loanType, borrowerName 
                     }}
                   >
                     {/* Month */}
-                    <TableCell sx={{ px: 1.5, py: 0.65 }}>
+                    <TableCell sx={{ px: 1.5, py: rowPaddingY }}>
                       <Box sx={{
                         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                        width: 22, height: 22, borderRadius: 1,
+                        width: 24, height: 24, borderRadius: 1,
                         bgcolor: isLast ? (isDark ? 'rgba(34,197,94,0.2)' : '#F0FDF4') : (isDark ? '#0F172A' : '#F3F4F6'),
-                        fontSize: '0.7rem', fontWeight: 700,
+                        fontSize: '0.72rem', fontWeight: 700,
                         color: isLast ? (isDark ? '#4ADE80' : '#15803D') : (isDark ? '#94A3B8' : '#6B7280'),
                       }}>
                         {row.month}
@@ -144,29 +170,29 @@ export default function MuiAmortizationTable({ schedule, loanType, borrowerName 
                     {/* Beginning Balance */}
                     <TableCell align="right" sx={{
                       fontFamily: '"Inter", monospace', color: isDark ? '#CBD5E1' : '#374151',
-                      fontSize: '0.78rem', letterSpacing: '-0.01em', py: 0.65, px: 1,
+                      fontSize: '0.78rem', letterSpacing: '-0.01em', py: rowPaddingY, px: 1,
                     }}>
                       {formatCurrency(row.balance)}
+                    </TableCell>
+
+                    {/* Principal */}
+                    <TableCell align="right" sx={{
+                      fontFamily: '"Inter", monospace', color: isDark ? '#60A5FA' : '#2563EB',
+                      fontWeight: 600, fontSize: '0.78rem', letterSpacing: '-0.01em', py: rowPaddingY, px: 1,
+                    }}>
+                      {formatCurrency(row.principal)}
                     </TableCell>
 
                     {/* Interest */}
                     <TableCell align="right" sx={{
                       fontFamily: '"Inter", monospace', color: isDark ? '#F59E0B' : '#D97706',
-                      fontWeight: 600, fontSize: '0.78rem', letterSpacing: '-0.01em', py: 0.65, px: 1,
+                      fontWeight: 600, fontSize: '0.78rem', letterSpacing: '-0.01em', py: rowPaddingY, px: 1,
                     }}>
                       {formatCurrency(row.interest)}
                     </TableCell>
 
-                    {/* Monthly Total */}
-                    <TableCell align="right" sx={{
-                      fontFamily: '"Inter", monospace', color: isDark ? '#94A3B8' : '#6B7280',
-                      fontSize: '0.78rem', letterSpacing: '-0.01em', py: 0.65, px: 1,
-                    }}>
-                      {formatCurrency(row.monthlyTotal)}
-                    </TableCell>
-
                     {/* Payment */}
-                    <TableCell align="right" sx={{ px: 1, py: 0.65 }}>
+                    <TableCell align="right" sx={{ px: 1, py: rowPaddingY }}>
                       <Box sx={{
                         display: 'inline-block',
                         fontFamily: '"Inter", monospace', fontWeight: 700,
@@ -187,7 +213,7 @@ export default function MuiAmortizationTable({ schedule, loanType, borrowerName 
                       fontFamily: '"Inter", monospace', fontWeight: 700,
                       fontSize: '0.78rem',
                       color: row.newBalance === 0 ? (isDark ? '#4ADE80' : '#15803D') : (isDark ? '#F8FAFC' : '#111827'),
-                      letterSpacing: '-0.01em', py: 0.65, px: 1,
+                      letterSpacing: '-0.01em', py: rowPaddingY, px: 1,
                     }}>
                       {row.newBalance === 0 ? (
                         <Box sx={{
@@ -234,22 +260,34 @@ export default function MuiAmortizationTable({ schedule, loanType, borrowerName 
         </Table>
       </TableContainer>
 
-      {/* Compact Footer */}
+      {/* Footer Pinned At Exact Bottom Edge */}
       {schedule.length > 0 && (
         <Box sx={{
           borderTop: '1px solid',
           borderColor: isDark ? '#334155' : '#F3F4F6',
           bgcolor: isDark ? '#0F172A' : '#F9FAFB',
-          px: 2, py: 1.25,
-          display: 'flex', justifyContent: 'flex-end', gap: 3,
+          px: 2.5, py: 1.5,
+          display: 'flex', justifyContent: 'flex-end', gap: 2.5,
+          mt: 'auto',
         }}>
+          <Box textAlign="right">
+            <Typography sx={{ color: 'text.secondary', display: 'block', mb: 0.1, fontWeight: 500, fontSize: '0.65rem' }}>
+              Total Principal
+            </Typography>
+            <Typography sx={{
+              color: isDark ? '#60A5FA' : '#2563EB', fontFamily: '"Inter", monospace',
+              fontWeight: 800, fontSize: '0.875rem', letterSpacing: '-0.02em',
+            }}>
+              {formatCurrency(totalPrincipal)}
+            </Typography>
+          </Box>
           <Box textAlign="right">
             <Typography sx={{ color: 'text.secondary', display: 'block', mb: 0.1, fontWeight: 500, fontSize: '0.65rem' }}>
               Total Interest
             </Typography>
             <Typography sx={{
               color: isDark ? '#F59E0B' : '#D97706', fontFamily: '"Inter", monospace',
-              fontWeight: 800, fontSize: '0.85rem', letterSpacing: '-0.02em',
+              fontWeight: 800, fontSize: '0.875rem', letterSpacing: '-0.02em',
             }}>
               {formatCurrency(totalInterest)}
             </Typography>
@@ -260,7 +298,7 @@ export default function MuiAmortizationTable({ schedule, loanType, borrowerName 
             </Typography>
             <Typography sx={{
               color: 'text.primary', fontFamily: '"Inter", monospace',
-              fontWeight: 800, fontSize: '0.85rem', letterSpacing: '-0.02em',
+              fontWeight: 800, fontSize: '0.875rem', letterSpacing: '-0.02em',
             }}>
               {formatCurrency(totalPayment)}
             </Typography>

@@ -91,7 +91,7 @@ export default function MuiHeader({ darkMode, onToggleDarkMode }) {
                 lineHeight: 1.15,
               }}
             >
-              Philippine Fiber Industry Development Authority
+              FIDA-V Employees Credit Cooperative (FECCO)
             </Typography>
 
             {/* Subtitle Line */}

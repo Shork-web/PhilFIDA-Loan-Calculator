@@ -45,7 +45,7 @@ export default function App() {
 
   // Custom Signatories State
   const [preparedByName, setPreparedByName]   = useState('');
-  const [preparedByTitle, setPreparedByTitle] = useState('PhilFIDA Account Officer');
+  const [preparedByTitle, setPreparedByTitle] = useState('FECCO Account Officer');
   const [approvedByName, setApprovedByName]   = useState('');
   const [approvedByTitle, setApprovedByTitle] = useState('Regional Director / OIC');
 
@@ -122,21 +122,19 @@ export default function App() {
           {/* Header with Dark Mode Toggle */}
           <MuiHeader darkMode={darkMode} onToggleDarkMode={handleToggleDarkMode} />
 
-          {/* Side-by-side Flex Layout */}
+          {/* Side-by-side Flex Layout — Stretched to Match Heights */}
           <Box sx={{
             display: 'flex',
-            flexDirection: 'row',
+            flexDirection: { xs: 'column', lg: 'row' },
             gap: 2,
-            alignItems: 'flex-start',
+            alignItems: 'stretch',
           }}>
 
             {/* Left Sidebar — Loan Parameter Form */}
             <Box
               sx={{
-                width: { xs: '300px', sm: '320px', md: '340px' },
+                width: { xs: '100%', lg: '340px' },
                 flexShrink: 0,
-                position: 'sticky',
-                top: 16,
               }}
             >
               <MuiLoanForm
@@ -159,7 +157,7 @@ export default function App() {
             </Box>
 
             {/* Right Side — Amortization Schedule & Simulator */}
-            <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Box sx={{ flex: 1, minWidth: 0, width: '100%', display: 'flex', flexDirection: 'column' }}>
 
               {/* Tab Bar */}
               <Box
@@ -201,8 +199,8 @@ export default function App() {
                 </Tabs>
               </Box>
 
-              {/* Panels */}
-              <Box>
+              {/* Panels — Fills full height */}
+              <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                 {activeTab === 0 && (
                   <MuiAmortizationTable schedule={calcResult.schedule} loanType={loanType} borrowerName={borrowerName} />
                 )}
@@ -231,7 +229,7 @@ export default function App() {
               gap: 1.5,
             }}
           >
-            {['PhilFIDA Interactive Loan Calculator', 'Philippine Fiber Industry Development Authority', 'Department of Agriculture'].map((text, i) => (
+            {['FECCO Interactive Loan Calculator', 'FIDA-V Employees Credit Cooperative (FECCO)', 'Department of Agriculture'].map((text, i) => (
               <React.Fragment key={text}>
                 {i > 0 && <Box sx={{ width: 3, height: 3, borderRadius: '50%', bgcolor: darkMode ? '#475569' : '#E5E7EB' }} />}
                 <Typography variant="caption" sx={{ color: darkMode ? '#64748B' : '#D1D5DB', fontWeight: 500, fontSize: '0.68rem' }}>

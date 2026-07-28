@@ -12,7 +12,7 @@ export default function PrintScheduleDocument({
   numMonths,
   calcResult,
   preparedByName = '',
-  preparedByTitle = 'PhilFIDA Account Officer',
+  preparedByTitle = 'FECCO Account Officer',
   approvedByName = '',
   approvedByTitle = 'Regional Director / OIC',
 }) {
@@ -28,7 +28,7 @@ export default function PrintScheduleDocument({
       <Box display="flex" flexDirection="column" alignItems="center" textAlign="center" mb={1.5}>
         <img
           src="/philfida-logo.png"
-          alt="Department of Agriculture - PhilFIDA Official Seal"
+          alt="DA - FECCO Official Seal"
           style={{ height: 52, width: 'auto', marginBottom: 6, objectFit: 'contain' }}
         />
         <Typography variant="overline" sx={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.08em', color: '#444', display: 'block', lineHeight: 1.1 }}>
@@ -38,7 +38,7 @@ export default function PrintScheduleDocument({
           DEPARTMENT OF AGRICULTURE
         </Typography>
         <Typography variant="h6" sx={{ fontWeight: 900, textTransform: 'uppercase', color: '#059669', fontSize: '1.1rem', letterSpacing: '-0.02em', my: 0.2 }}>
-          PHILIPPINE FIBER INDUSTRY DEVELOPMENT AUTHORITY
+          FIDA-V EMPLOYEES CREDIT COOPERATIVE (FECCO)
         </Typography>
         <Typography variant="subtitle2" sx={{ fontWeight: 700, fontSize: '0.75rem', color: '#333' }}>
           REGIONAL OFFICE V (BICOL REGION)
@@ -56,7 +56,7 @@ export default function PrintScheduleDocument({
           OFFICIAL LOAN AMORTIZATION SCHEDULE
         </Typography>
         <Typography variant="caption" sx={{ color: '#555', fontSize: '0.68rem' }}>
-          Issued on {currentDate} &bull; PhilFIDA Region V Credit & Financial Operations
+          Issued on {currentDate} &bull; FECCO Credit & Financial Operations
         </Typography>
       </Box>
 
@@ -107,8 +107,8 @@ export default function PrintScheduleDocument({
           <tr style={{ backgroundColor: '#f2f2f2' }}>
             <th style={{ border: '1px solid #333', padding: '5px 6px', textAlign: 'center', width: '36px' }}>#</th>
             <th style={{ border: '1px solid #333', padding: '5px 6px', textAlign: 'right' }}>Beginning Balance</th>
+            <th style={{ border: '1px solid #333', padding: '5px 6px', textAlign: 'right' }}>Principal Paid</th>
             <th style={{ border: '1px solid #333', padding: '5px 6px', textAlign: 'right' }}>Interest Paid</th>
-            <th style={{ border: '1px solid #333', padding: '5px 6px', textAlign: 'right' }}>Monthly Total</th>
             <th style={{ border: '1px solid #333', padding: '5px 6px', textAlign: 'right' }}>Monthly Payment</th>
             <th style={{ border: '1px solid #333', padding: '5px 6px', textAlign: 'right' }}>Ending Balance</th>
           </tr>
@@ -118,9 +118,9 @@ export default function PrintScheduleDocument({
             <tr key={row.month} style={{ pageBreakInside: 'avoid' }}>
               <td style={{ border: '1px solid #333', padding: '3.5px 6px', textAlign: 'center', fontWeight: 'bold' }}>{row.month}</td>
               <td style={{ border: '1px solid #333', padding: '3.5px 6px', textAlign: 'right', fontFamily: 'monospace' }}>{formatCurrency(row.balance)}</td>
-              <td style={{ border: '1px solid #333', padding: '3.5px 6px', textAlign: 'right', fontFamily: 'monospace' }}>{formatCurrency(row.interest)}</td>
-              <td style={{ border: '1px solid #333', padding: '3.5px 6px', textAlign: 'right', fontFamily: 'monospace' }}>{formatCurrency(row.monthlyTotal)}</td>
-              <td style={{ border: '1px solid #333', padding: '3.5px 6px', textAlign: 'right', fontFamily: 'monospace', fontWeight: 'bold' }}>{formatCurrency(row.payment)}</td>
+              <td style={{ border: '1px solid #333', padding: '3.5px 6px', textAlign: 'right', fontFamily: 'monospace', fontWeight: 'bold', color: '#1d4ed8' }}>{formatCurrency(row.principal)}</td>
+              <td style={{ border: '1px solid #333', padding: '3.5px 6px', textAlign: 'right', fontFamily: 'monospace', color: '#b45309' }}>{formatCurrency(row.interest)}</td>
+              <td style={{ border: '1px solid #333', padding: '3.5px 6px', textAlign: 'right', fontFamily: 'monospace', fontWeight: 'bold', color: '#047857' }}>{formatCurrency(row.payment)}</td>
               <td style={{ border: '1px solid #333', padding: '3.5px 6px', textAlign: 'right', fontFamily: 'monospace', fontWeight: 'bold' }}>{row.newBalance === 0 ? '₱0.00' : formatCurrency(row.newBalance)}</td>
             </tr>
           ))}
@@ -128,9 +128,9 @@ export default function PrintScheduleDocument({
         <tfoot>
           <tr style={{ backgroundColor: '#f9f9f9', fontWeight: 'bold' }}>
             <td colSpan={2} style={{ border: '1px solid #333', padding: '5px 6px', textAlign: 'right' }}>TOTALS:</td>
-            <td style={{ border: '1px solid #333', padding: '5px 6px', textAlign: 'right', fontFamily: 'monospace' }}>{formatCurrency(calcResult.totalInterestPaid)}</td>
-            <td style={{ border: '1px solid #333', padding: '5px 6px' }}></td>
-            <td style={{ border: '1px solid #333', padding: '5px 6px', textAlign: 'right', fontFamily: 'monospace' }}>{formatCurrency(calcResult.totalRepayment)}</td>
+            <td style={{ border: '1px solid #333', padding: '5px 6px', textAlign: 'right', fontFamily: 'monospace', color: '#1d4ed8' }}>{formatCurrency(calcResult.schedule.reduce((s, r) => s + r.principal, 0))}</td>
+            <td style={{ border: '1px solid #333', padding: '5px 6px', textAlign: 'right', fontFamily: 'monospace', color: '#b45309' }}>{formatCurrency(calcResult.totalInterestPaid)}</td>
+            <td style={{ border: '1px solid #333', padding: '5px 6px', textAlign: 'right', fontFamily: 'monospace', color: '#047857' }}>{formatCurrency(calcResult.totalRepayment)}</td>
             <td style={{ border: '1px solid #333', padding: '5px 6px' }}></td>
           </tr>
         </tfoot>
@@ -153,7 +153,7 @@ export default function PrintScheduleDocument({
           </Box>
           <Box sx={{ borderBottom: '1.5px solid #000', width: '220px', mb: 0.4 }} />
           <Typography variant="body2" sx={{ fontWeight: 700, fontSize: '0.78rem' }}>
-            {preparedByTitle || 'PhilFIDA Account Officer'}
+            {preparedByTitle || 'FECCO Account Officer'}
           </Typography>
         </Box>
 
@@ -180,7 +180,7 @@ export default function PrintScheduleDocument({
       {/* Disclaimer */}
       <Box className="print-avoid-break" mt={2} pt={1} sx={{ borderTop: '1px solid #ddd', textAlign: 'center' }}>
         <Typography variant="caption" sx={{ color: '#777', fontSize: '0.6rem' }}>
-          Notice: This official computer-generated loan amortization schedule is issued by the Philippine Fiber Industry Development Authority (PhilFIDA) Regional Office V for official calculation, verification, and record-keeping purposes.
+          Notice: This official computer-generated loan amortization schedule is issued by the FIDA-V Employees Credit Cooperative (FECCO) for official calculation, verification, and record-keeping purposes.
         </Typography>
       </Box>
     </Box>

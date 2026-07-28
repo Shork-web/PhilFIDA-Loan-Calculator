@@ -39,12 +39,15 @@ export function calculateLoanAmortization({
 
   for (let i = 1; i <= n; i++) {
     const interest = currentBalance * r;
-    const monthlyTotal = currentBalance + interest;
-    let newBalance = monthlyTotal - monthlyPayment;
+    let principal = monthlyPayment - interest;
+    let newBalance = currentBalance - principal;
+    let currentPayment = monthlyPayment;
 
     // Handle final period rounding adjustments
-    if (i === n && Math.abs(newBalance) < 1) {
+    if (i === n || newBalance < 0.01) {
+      principal = currentBalance;
       newBalance = 0;
+      currentPayment = principal + interest;
     }
 
     totalInterestPaid += interest;
@@ -52,9 +55,10 @@ export function calculateLoanAmortization({
     schedule.push({
       month: i,
       balance: currentBalance,
+      principal: principal,
       interest: interest,
-      monthlyTotal: monthlyTotal,
-      payment: monthlyPayment,
+      monthlyTotal: currentPayment,
+      payment: currentPayment,
       newBalance: Math.max(0, newBalance),
     });
 
@@ -92,7 +96,7 @@ export async function downloadAmortizationCSV({
   numMonths,
   calcResult,
   preparedByName = '',
-  preparedByTitle = 'PhilFIDA Account Officer',
+  preparedByTitle = 'FECCO Account Officer',
   approvedByName = '',
   approvedByTitle = 'Regional Director / OIC',
 }) {
@@ -120,7 +124,7 @@ export async function downloadAmortizationCSV({
   const themeConfig = PROGRAM_THEMES[loanType] || PROGRAM_THEMES['Regular Loan'];
 
   const workbook = new ExcelJS.Workbook();
-  workbook.creator = 'PhilFIDA Regional Office V';
+  workbook.creator = 'FIDA-V Employees Credit Cooperative (FECCO)';
   workbook.created = new Date();
 
   const ws = workbook.addWorksheet('Amortization Schedule', {
@@ -171,7 +175,7 @@ export async function downloadAmortizationCSV({
 
   ws.mergeCells('A3:F3');
   const r3 = ws.getCell('A3');
-  r3.value = 'PHILIPPINE FIBER INDUSTRY DEVELOPMENT AUTHORITY';
+  r3.value = 'FIDA-V EMPLOYEES CREDIT COOPERATIVE (FECCO)';
   r3.font = { name: 'Segoe UI', size: 14, bold: true, color: { argb: 'FF' + themeConfig.primary } };
   r3.alignment = { horizontal: 'center', vertical: 'middle' };
 
@@ -201,7 +205,7 @@ export async function downloadAmortizationCSV({
 
   ws.mergeCells('A8:F8');
   const r8 = ws.getCell('A8');
-  r8.value = `Issued on ${currentDate} at ${timeStamp} | PhilFIDA Credit & Financial Operations`;
+  r8.value = `Issued on ${currentDate} at ${timeStamp} | FECCO Credit & Financial Operations`;
   r8.font = { name: 'Segoe UI', size: 8.5, bold: true, color: { argb: 'FF6B7280' } };
   r8.alignment = { horizontal: 'center', vertical: 'middle' };
 
@@ -256,7 +260,7 @@ export async function downloadAmortizationCSV({
   ws.addRow([]); // Blank row before table
 
   // 4. Color-Coded Table Header (Row 22)
-  const headers = ['#', 'Beginning Balance (PHP)', 'Interest Paid (PHP)', 'Monthly Total (PHP)', 'Monthly Payment (PHP)', 'Ending Balance (PHP)'];
+  const headers = ['#', 'Beginning Balance (PHP)', 'Principal Paid (PHP)', 'Interest Paid (PHP)', 'Monthly Payment (PHP)', 'Ending Balance (PHP)'];
   const headerRowIdx = 22;
   const headerRow = ws.getRow(headerRowIdx);
   headerRow.height = 26;
@@ -269,6 +273,8 @@ export async function downloadAmortizationCSV({
 
     // Distinct Column Color Coding Fills
     if (colIdx === 2) {
+      applyFill(cell, '2563EB'); // Royal Blue for Principal Paid
+    } else if (colIdx === 3) {
       applyFill(cell, 'D97706'); // Warm Amber for Interest Paid
     } else if (colIdx === 4) {
       applyFill(cell, '16A34A'); // Emerald Green for Monthly Payment
@@ -303,22 +309,23 @@ export async function downloadAmortizationCSV({
     applyFill(c2, bgHex);
     applyBorders(c2);
 
-    // Col 3: Interest Paid — Soft Amber Tint
+    // Col 3: Principal Paid — Soft Blue Tint
     const c3 = rObj.getCell(3);
-    c3.value = row.interest;
+    c3.value = row.principal;
     c3.numFmt = '"₱"#,##0.00';
     c3.alignment = { horizontal: 'right', vertical: 'middle' };
-    c3.font = { name: 'Segoe UI', size: 9.5, color: { argb: 'FFB45309' } };
-    applyFill(c3, 'FFFBEB'); // Warm Amber Soft Fill
-    applyBorders(c3, 'FDE68A');
+    c3.font = { name: 'Segoe UI', size: 9.5, bold: true, color: { argb: 'FF1D4ED8' } };
+    applyFill(c3, 'EFF6FF'); // Soft Blue Fill
+    applyBorders(c3, 'BFDBFE');
 
-    // Col 4: Monthly Total
+    // Col 4: Interest Paid — Soft Amber Tint
     const c4 = rObj.getCell(4);
-    c4.value = row.monthlyTotal;
+    c4.value = row.interest;
     c4.numFmt = '"₱"#,##0.00';
     c4.alignment = { horizontal: 'right', vertical: 'middle' };
-    applyFill(c4, bgHex);
-    applyBorders(c4);
+    c4.font = { name: 'Segoe UI', size: 9.5, color: { argb: 'FFB45309' } };
+    applyFill(c4, 'FFFBEB'); // Warm Amber Soft Fill
+    applyBorders(c4, 'FDE68A');
 
     // Col 5: Monthly Payment — Soft Emerald Tint
     const c5 = rObj.getCell(5);
@@ -356,18 +363,22 @@ export async function downloadAmortizationCSV({
   tLabel.alignment = { horizontal: 'right', vertical: 'middle' };
   tLabel.font = { name: 'Segoe UI', size: 10, bold: true, color: { argb: 'FF111827' } };
 
+  // Total Principal
+  const totalPrincipalPaid = schedule.reduce((s, r) => s + r.principal, 0);
+  const tPrin = tRow.getCell(3);
+  tPrin.value = totalPrincipalPaid;
+  tPrin.numFmt = '"₱"#,##0.00';
+  tPrin.alignment = { horizontal: 'right', vertical: 'middle' };
+  tPrin.font = { name: 'Segoe UI', size: 10, bold: true, color: { argb: 'FF1D4ED8' } };
+  applyFill(tPrin, 'DBEAFE');
+
   // Total Interest
-  const tInt = tRow.getCell(3);
+  const tInt = tRow.getCell(4);
   tInt.value = totalInterest;
   tInt.numFmt = '"₱"#,##0.00';
   tInt.alignment = { horizontal: 'right', vertical: 'middle' };
   tInt.font = { name: 'Segoe UI', size: 10, bold: true, color: { argb: 'FFB45309' } };
   applyFill(tInt, 'FEF3C7');
-
-  // Col 4 Blank Total
-  const t4 = tRow.getCell(4);
-  t4.value = '-';
-  t4.alignment = { horizontal: 'center', vertical: 'middle' };
 
   // Total Repayment
   const tRep = tRow.getCell(5);
@@ -428,7 +439,7 @@ export async function downloadAmortizationCSV({
   const titleRowIdx = sigStartIdx + 4;
   ws.mergeCells(`A${titleRowIdx}:C${titleRowIdx}`);
   ws.mergeCells(`D${titleRowIdx}:F${titleRowIdx}`);
-  ws.getCell(`A${titleRowIdx}`).value = '  ' + (preparedByTitle || 'PhilFIDA Account Officer');
+  ws.getCell(`A${titleRowIdx}`).value = '  ' + (preparedByTitle || 'FECCO Account Officer');
   ws.getCell(`D${titleRowIdx}`).value = '  ' + (approvedByTitle || 'Regional Director / OIC');
 
   // Generate Buffer & Trigger Browser Download
@@ -438,7 +449,7 @@ export async function downloadAmortizationCSV({
 
   const cleanLoanName = (loanType || 'Regular_Loan').replace(/\s+/g, '_');
   const dateStr = new Date().toISOString().slice(0, 10);
-  const filename = `PhilFIDA_Amortization_Schedule_${cleanLoanName}_${dateStr}.xlsx`;
+  const filename = `FECCO_Amortization_Schedule_${cleanLoanName}_${dateStr}.xlsx`;
 
   const link = document.createElement('a');
   link.href = url;

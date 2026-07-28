@@ -204,7 +204,7 @@ export default function MuiLoanForm({
 
           <TextField
             label="Designated Office / Station"
-            placeholder="e.g. PhilFIDA Region V - Legazpi Station"
+            placeholder="e.g. FECCO Legazpi Office"
             value={borrowerOffice}
             onChange={(e) => setBorrowerOffice(e.target.value)}
             fullWidth size="small"
@@ -349,7 +349,7 @@ export default function MuiLoanForm({
               />
               <TextField
                 label="Officer Title"
-                placeholder="PhilFIDA Account Officer"
+                placeholder="FECCO Account Officer"
                 value={preparedByTitle}
                 onChange={(e) => setPreparedByTitle(e.target.value)}
                 fullWidth size="small"
