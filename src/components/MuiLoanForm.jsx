@@ -20,7 +20,7 @@ import { formatCurrency } from '../utils/loanCalculations';
 const PRESET_CONFIG = {
   regular:   { color: '#16A34A', light: '#F0FDF4', label: 'Regular',   rate: '1.0%' },
   emergency: { color: '#2563EB', light: '#EFF6FF', label: 'Emergency', rate: '0.5%' },
-  provident: { color: '#D97706', light: '#FFFBEB', label: 'Provident', rate: '1.0%' },
+  provident: { color: '#D97706', light: '#FFFBEB', label: 'Provident', rate: '0.75%' },
   special:   { color: '#7C3AED', light: '#FAF5FF', label: 'Special',   rate: '1.0%' },
 };
 

@@ -21,9 +21,9 @@ export const PHILFIDA_LOAN_PRESETS = [
     id: 'provident',
     name: 'Provident Loan',
     amount: 80000,
-    monthlyRateDecimal: 0.01, // 1%
+    monthlyRateDecimal: 0.0075, // 0.75%
     months: 15,
-    badge: 'Provident 1.0%',
+    badge: 'Provident 0.75%',
     color: 'warning'
   },
   {
